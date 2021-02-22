@@ -95,7 +95,9 @@ const displayEvent = (e) => {
 const saveEvent = () => {
     const eventDate = document.getElementById('evt-date').textContent;
     const eventDetails = document.getElementById('evt-details').value;
-
+    if (!eventDetails) {
+        return;
+    }
     events[eventDate] = {
         details: eventDetails
     };
