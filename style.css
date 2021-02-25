@@ -50,7 +50,7 @@ body {
 
 .nameOfTheMonth {
     font-size: 3rem;
-    font-weight: 400;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.2rem;
     margin-bottom: 1rem;
@@ -58,6 +58,7 @@ body {
 
 .currentDate {
     font-size: 1.6rem;
+    font-weight: 400;
 }
 
 .weekdays {
@@ -94,14 +95,13 @@ body {
     height: 5rem;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
     text-shadow: 0.3rem 0.5rem rgba(0,0,0, 0.3);
     transition: background-color .2s;
 }
 
 .day:hover:not(.today) {
     background-color: #262626;
-    border: .2rem solid #777;
+    border: .2rem solid #1EE7E7;
     cursor: pointer;
 }
 
@@ -116,11 +116,12 @@ body {
     cursor: pointer;
 }
 
-#cal-event {
+.cal-events {
     margin-bottom: 20px;
+    margin-left: 30px;
 }
 
-#cal-event form {
+.cal-events form {
     width: 300px;
     float: right;
     padding: 15px;
@@ -129,16 +130,49 @@ body {
     border: 1px solid #3F88B1;
 }
 
-#cal-event h1 {
+.cal-events h1 {
+    text-align: center;
     color: #E9ECEF;
-    padding: 0;
+    background-color: #3F88B1;
+    border-radius: 5px;
+    padding: 5px;
     margin: 0;
 }
 
-#cal-event textarea {
+#evt-date {
+    text-align: center;
+    margin: 10px;
+    font-size: 12px;
+}
+
+.day-evt {
+    position: relative;
+    padding: 10px;
+    margin-bottom: 15px;
+    background-color: #1EE7E7;
+    border-radius: 5px;
+}
+
+.evt-title {
+    color: #222227;
+    font-weight: 700;
+    font-size: 12px;
+}
+.evt-delete {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+}
+
+.evt-delete:hover {
+    cursor: pointer;
+}
+
+.cal-events textarea {
     display: block;
     width: 90%;
-    padding: 10px;
+    padding: 5px;
     margin: 10px 0;
     border-inline: none;
     border: 1px solid #3F88B1;
@@ -146,7 +180,7 @@ body {
     resize: none;
 }
 
-#cal-event input[type=button], input[type=submit] {
+.cal-events input[type=button], input[type=submit] {
     padding: 10px;
     margin: 5px;
     font-size: 1.2em;
@@ -156,13 +190,11 @@ body {
     border-radius: 10px;
 }
 
-#evt {
-    position: absolute;
-    align-items: center;
-    font-size: 11px;
+#point {
     color: #1EE7E7;
+    height: auto;
+    position: absolute;
+    padding-top: 19px;
 }
-
-
 
 

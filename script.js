@@ -1,12 +1,19 @@
-const date = new Date();
-let day = "";
 const months = [
-    "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
 ];
 
-const currentMonth = document.querySelector('.nameOfTheMonth').innerHTML = months[date.getMonth()];
-const currentDay = document.querySelector('.currentDate').innerHTML = new Date().toDateString();
-
+const date = new Date();
 const events = JSON.parse(localStorage.getItem('events')) || {};
 
 const createPreviousMonthDays = (firstDayIndex, prevLastDay) => {
@@ -46,6 +53,7 @@ const renderCalendar = () => {
 
     const monthDays = document.querySelector('.days');
     const monthName = document.querySelector('.nameOfTheMonth');
+    const currentYear = document.querySelector('.currentDate');
 
     const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
     const prevLastDay = new Date(date.getFullYear(), date.getMonth(), 0).getDate();
@@ -60,64 +68,119 @@ const renderCalendar = () => {
 
     monthDays.innerHTML = days;
     monthName.textContent = months[date.getMonth()];
+    currentYear.textContent = date.getFullYear().toString();
 
     monthDays.childNodes.forEach((day) => {
-        const event = getEvent(day.dataset.day);
+        const event = getDayEvents(day.dataset.day);
         if (event) {
-            day.insertAdjacentHTML('beforeend', `<div id='evt'>${event.details}</div>`);
+            day.insertAdjacentHTML('beforeend', `<div id='point'><i class="far fa-calendar"></i></div>`);
         }
-        day.addEventListener("click", (e) => displayEvent(e));
+        day.addEventListener("click", (e) => displayEvents(e));
     });
 }    //end function renderCalendar
 
+const getDayEvents = (day) => {
+    return events[day];
+}
 
-const getEvent = (day) => { return events[day]; }
+const updateLocalEvents = () => {
+    localStorage.setItem('events', JSON.stringify(events));
+}
 
-const displayEvent = (e) => {
-    const container = document.getElementById("cal-event");
+const displayEvents = (e) => {
+    const container = document.querySelector(".cal-events");
     const formElem = document.createElement('form');
+    const dayEvents = createElement('div', 'day-events');
     const day = e.currentTarget.dataset.day;
-    const event = getEvent(day);
+    const events = getDayEvents(day);
 
     formElem.innerHTML = `
-        <h1>${event ? 'EDIT' : 'ADD'}</h1>
+        <h1>Events</h1>
         <div id='evt-date'>${day}</div>
-        <textarea id='evt-details' required>${event ? event.details : ''}</textarea>
+    `;
+
+    if (events) {
+        events.forEach((event) => {
+            dayEvents.insertAdjacentHTML('beforeend', renderEvent(event))
+        });
+    } else {
+        formElem.insertAdjacentHTML('beforeend', '<div class="evt-empty">No Events</div>')
+    }
+    formElem.append(dayEvents);
+
+    formElem.insertAdjacentHTML('beforeend', `
+        <textarea id='evt-title' placeholder="Add Event" required></textarea>
         <input type='submit' id='save' value='Save'/>
         <input type='button' id="close" value='Close'/>
-        ${ event ? `<input type='button' id='delete' data-delete=${day} value='Delete'/>` : '' }
-    `;
+    `);
 
     container.innerHTML = '';
     container.appendChild(formElem);
 }
 
-const saveEvent = () => {
-    const eventDate = document.getElementById('evt-date').textContent;
-    const eventDetails = document.getElementById('evt-details').value;
-    if (!eventDetails) {
+const createElement = (tagName, className = '') => {
+    const element = document.createElement(tagName);
+    element.className = className;
+
+    return element;
+};
+
+const renderEvent = (event) => {
+    return `
+            <div class="day-evt"">
+                <div class="evt-title">${event.title}</div>
+                <div class="evt-delete fas fa-times fa-2x" id="delete"></div>          
+            </div>
+        `;
+}
+
+const createEvent = (e) => {
+    e.preventDefault();
+
+    const day = document.getElementById('evt-date').textContent;
+    const eventTitleElem = document.getElementById('evt-title');
+    const eventTitle = eventTitleElem.value;
+    const dayEventsElem = document.querySelector('.day-events');
+    const noEventsElem = document.querySelector('.evt-empty');
+
+    if (!eventTitle) {
         return;
     }
-    events[eventDate] = {
-        details: eventDetails
+
+    const event = {
+        title: eventTitle
     };
-    localStorage.setItem('events', JSON.stringify(events));
+
+    (events[day] = getDayEvents(day) || []).push(event);
+    updateLocalEvents();
+
+    if (noEventsElem) {
+        noEventsElem.remove();
+
+    }
+    dayEventsElem.insertAdjacentHTML('beforeend', renderEvent(event));
+    eventTitleElem.value = '';
+
 }
 
 const deleteEvent = (e) => {
-    const day = e.target.dataset.delete;
+    const day = document.getElementById('evt-date').textContent;
+    const selectedEventElem = e.target.parentElement;
+    const eventIndex = Array.from(selectedEventElem.parentNode.children).indexOf(selectedEventElem);
+    let dayEvents = getDayEvents(day);
     if (confirm("Are you sure you want to remove event?")) {
-        const dayElem = document.querySelectorAll(`[data-day='${day}']`)[0];
-
-        dayElem.removeChild(dayElem.lastChild);
-        delete events[day];
-        localStorage.setItem('events', JSON.stringify(events));
-        closeEvent();
+        selectedEventElem.remove();
+        dayEvents.splice(eventIndex, 1)
+        if (dayEvents.length === 0) {
+            delete events[day];
+            document.getElementById('point').remove();
+        }
+        updateLocalEvents();
     }
 }
 
 const closeEvent = () => {
-    document.getElementById("cal-event").innerHTML = "";
+    document.querySelector(".cal-events").innerHTML = "";
 }
 
 const formatDate = (date) => {
@@ -134,18 +197,27 @@ const formatDate = (date) => {
     return [year, month, day].join('-');
 }
 
+const getPreviousMonth = () => {
+    date.setMonth(date.getMonth() - 1);
+    renderCalendar();
+}
+const getNextMonth = () => {
+    date.setMonth(date.getMonth() + 1);
+    renderCalendar();
+}
+
 document.addEventListener('click', (e) => {
     const byId = e.target.id;
 
     switch (byId) {
         case 'prev':
-            date.setMonth(date.getMonth() - 1);
+            getPreviousMonth();
             break;
         case 'next':
-            date.setMonth(date.getMonth() + 1);
+            getNextMonth();
             break;
         case 'save':
-            saveEvent();
+            createEvent(e);
             break;
         case 'delete':
             deleteEvent(e);
@@ -154,7 +226,6 @@ document.addEventListener('click', (e) => {
             closeEvent();
             break;
     }
-    renderCalendar();
 })
 
 renderCalendar();
