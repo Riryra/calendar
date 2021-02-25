@@ -125,19 +125,21 @@ const createElement = (tagName, className = '') => {
     return element;
 };
 
+const point = document.getElementById('point');
 const renderEvent = (event) => {
     return `
             <div class="day-evt"">
                 <div class="evt-title">${event.title}</div>
                 <div class="evt-delete fas fa-times fa-2x" id="delete"></div>          
             </div>
-        `;
+            `;
 }
 
 const createEvent = (e) => {
     e.preventDefault();
 
     const day = document.getElementById('evt-date').textContent;
+    const dayElem =  document.querySelector(`[data-day="${day}"]`);
     const eventTitleElem = document.getElementById('evt-title');
     const eventTitle = eventTitleElem.value;
     const dayEventsElem = document.querySelector('.day-events');
@@ -156,7 +158,7 @@ const createEvent = (e) => {
 
     if (noEventsElem) {
         noEventsElem.remove();
-
+        dayElem.insertAdjacentHTML('beforeend', `<div id='point'><i class="far fa-calendar"></i></div>`);
     }
     dayEventsElem.insertAdjacentHTML('beforeend', renderEvent(event));
     eventTitleElem.value = '';
@@ -164,7 +166,8 @@ const createEvent = (e) => {
 }
 
 const deleteEvent = (e) => {
-    const day = document.getElementById('evt-date').textContent;
+    const eventDate = document.getElementById('evt-date');
+    const day = eventDate.textContent;
     const selectedEventElem = e.target.parentElement;
     const eventIndex = Array.from(selectedEventElem.parentNode.children).indexOf(selectedEventElem);
     let dayEvents = getDayEvents(day);
@@ -174,7 +177,8 @@ const deleteEvent = (e) => {
         if (dayEvents.length === 0) {
             delete events[day];
             document.getElementById('point').remove();
-        }
+            eventDate.insertAdjacentHTML('afterend', '<div class="evt-empty">No Events</div>');
+           }
         updateLocalEvents();
     }
 }
