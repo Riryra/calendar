@@ -61,7 +61,7 @@ const renderCalendar = () => {
     const lastDayIndex = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDay();
     const nextDays = 7 - lastDayIndex - 1;
 
-    let days = "";
+    let days = '';
     days += createPreviousMonthDays(firstDayIndex, prevLastDay);
     days += createCurrentMonthDays(lastDay);
     days += createNextMonthDays(nextDays);
@@ -75,7 +75,7 @@ const renderCalendar = () => {
         if (event) {
             day.insertAdjacentHTML('beforeend', `<div id='point'><i class="far fa-calendar"></i></div>`);
         }
-        day.addEventListener("click", (e) => displayEvents(e));
+        day.addEventListener('click', (e) => displayEvents(e));
     });
 }    //end function renderCalendar
 
@@ -107,11 +107,10 @@ const displayEvents = (e) => {
         formElem.insertAdjacentHTML('beforeend', '<div class="evt-empty">No Events</div>')
     }
     formElem.append(dayEvents);
-
     formElem.insertAdjacentHTML('beforeend', `
         <textarea id='evt-title' placeholder="Add Event" required></textarea>
         <input type='submit' id='save' value='Save'/>
-        <input type='button' id="close" value='Close'/>
+        <input type='button' id='close' value='Close'/>
     `);
 
     container.innerHTML = '';
@@ -125,7 +124,6 @@ const createElement = (tagName, className = '') => {
     return element;
 };
 
-const point = document.getElementById('point');
 const renderEvent = (event) => {
     return `
             <div class="day-evt"">
@@ -153,7 +151,8 @@ const createEvent = (e) => {
         title: eventTitle
     };
 
-    (events[day] = getDayEvents(day) || []).push(event);
+    events[day] = (getDayEvents(day) || []);
+    events[day].push(event);
     updateLocalEvents();
 
     if (noEventsElem) {
@@ -178,7 +177,7 @@ const deleteEvent = (e) => {
             delete events[day];
             document.getElementById('point').remove();
             eventDate.insertAdjacentHTML('afterend', '<div class="evt-empty">No Events</div>');
-           }
+        }
         updateLocalEvents();
     }
 }
